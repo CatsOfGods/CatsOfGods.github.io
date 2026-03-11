@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#07000e">
+<title>404 — lost signal</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap');
+:root{--bg:#07000e;--purple:#6b1fc1;--mid:#9944ee;--bright:#b877ff;--glow:#d4aaff;--text:#e8e0f5;--dim:rgba(180,140,255,0.18);}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;height:100%;background:var(--bg);overflow:hidden;font-family:'DM Mono',monospace;color:var(--text);-webkit-tap-highlight-color:transparent;}
+@media(hover:hover){html,body{cursor:none;}}
+
+#cvs{position:fixed;inset:0;z-index:0;}
+body::after{content:'';position:fixed;inset:0;z-index:2;background:repeating-linear-gradient(180deg,transparent 0px,transparent 3px,rgba(0,0,0,0.04) 3px,rgba(0,0,0,0.04) 4px);pointer-events:none;}
+#vig{position:fixed;inset:0;z-index:3;pointer-events:none;background:radial-gradient(ellipse 80% 80% at 50% 50%,transparent 30%,rgba(0,0,0,0.86) 100%);}
+
+/* content */
+#wrap{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;text-align:center;padding:20px;}
+
+#err-num{
+  font-family:'DM Serif Display',serif;
+  font-style:italic;
+  font-size:clamp(100px,22vw,180px);
+  line-height:1;
+  color:transparent;
+  -webkit-text-stroke:1px rgba(180,140,255,0.12);
+  letter-spacing:-0.02em;
+  user-select:none;
+  animation:glitch-num 4.5s ease-in-out infinite;
+  position:relative;
+}
+#err-num::before,#err-num::after{
+  content:'404';
+  position:absolute;left:0;top:0;width:100%;
+  -webkit-text-stroke:1px var(--mid);
+  color:transparent;
+}
+#err-num::before{animation:glitch-a 4.5s ease-in-out infinite;clip-path:inset(0 0 60% 0);}
+#err-num::after{animation:glitch-b 4.5s ease-in-out infinite;clip-path:inset(55% 0 0 0);color:rgba(212,170,255,0.08);}
+
+@keyframes glitch-num{0%,90%,100%{transform:none;}91%{transform:skewX(-3deg);}93%{transform:skewX(2deg);}95%{transform:none;}}
+@keyframes glitch-a{0%,88%,100%{transform:none;opacity:0;}89%{transform:translate(-3px,0);opacity:1;}92%{transform:translate(2px,0);opacity:1;}94%{opacity:0;}}
+@keyframes glitch-b{0%,88%,100%{transform:none;opacity:0;}89%{transform:translate(3px,1px);opacity:1;}92%{transform:translate(-2px,0);opacity:1;}94%{opacity:0;}}
+
+#err-label{
+  font-size:clamp(7px,1.7vw,9px);
+  letter-spacing:0.55em;
+  color:rgba(180,140,255,0.25);
+  text-transform:uppercase;
+  margin-top:clamp(4px,1vw,8px);
+  margin-bottom:clamp(24px,5vw,40px);
+  opacity:0;
+  animation:soft-in 0.8s ease 0.3s forwards;
+}
+
+#err-title{
+  font-family:'DM Serif Display',serif;
+  font-style:italic;
+  font-size:clamp(18px,4.5vw,32px);
+  color:var(--glow);
+  margin-bottom:clamp(10px,2vw,16px);
+  text-shadow:0 0 30px rgba(107,31,193,0.4);
+  opacity:0;
+  animation:soft-in 0.9s ease 0.6s forwards;
+}
+
+#err-sub{
+  font-size:clamp(10px,2.1vw,12px);
+  letter-spacing:0.12em;
+  color:rgba(180,140,255,0.35);
+  line-height:1.9;
+  max-width:min(300px,80vw);
+  margin-bottom:clamp(28px,5vw,44px);
+  opacity:0;
+  animation:soft-in 0.9s ease 0.9s forwards;
+}
+
+#back-btn{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:clamp(11px,2.5vw,14px) clamp(24px,5vw,36px);
+  background:transparent;
+  border:1px solid rgba(180,140,255,0.25);
+  color:var(--glow);
+  font-family:'DM Mono',monospace;
+  font-size:clamp(10px,2.1vw,11px);
+  letter-spacing:0.28em;text-transform:uppercase;
+  text-decoration:none;
+  position:relative;overflow:hidden;
+  transition:border-color .3s,color .3s;
+  opacity:0;animation:soft-in .9s ease 1.2s forwards;
+  min-height:44px;
+}
+@media(hover:hover){#back-btn{cursor:none;}}
+@media(hover:none){#back-btn{cursor:pointer;}}
+#back-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(180,140,255,0.1),transparent);transform:translateX(-100%);transition:transform .5s;}
+#back-btn:hover{border-color:var(--glow);color:#fff;}
+#back-btn:hover::before{transform:translateX(100%);}
+
+/* corners */
+#tl{position:fixed;top:clamp(14px,3vw,22px);left:clamp(14px,3vw,22px);font-size:clamp(7px,1.5vw,8px);letter-spacing:0.38em;color:var(--dim);text-transform:uppercase;}
+#tr{position:fixed;top:clamp(14px,3vw,22px);right:clamp(14px,3vw,22px);font-size:clamp(7px,1.5vw,8px);letter-spacing:0.38em;color:var(--dim);text-transform:uppercase;}
+
+/* drifting fragments */
+.frag{position:fixed;pointer-events:none;z-index:4;font-size:clamp(9px,2vw,12px);letter-spacing:0.4em;color:rgba(180,140,255,0.08);text-transform:uppercase;}
+
+/* cursor */
+#cursor-dot{position:fixed;z-index:9999;pointer-events:none;width:4px;height:4px;border-radius:50%;background:var(--glow);box-shadow:0 0 6px 2px rgba(212,170,255,.4);transform:translate(-50%,-50%);}
+@media(hover:none){#cursor-dot{display:none;}}
+#cat-cursor{position:fixed;z-index:9997;pointer-events:none;transform:translate(-50%,-70%);}
+#cat-cursor svg{width:clamp(20px,4vw,26px);height:clamp(20px,4vw,26px);filter:drop-shadow(0 0 4px rgba(180,140,255,0.4));}
+#cat-cursor.run svg{transform:scaleX(-1);}
+@media(hover:none){#cat-cursor{display:none;}}
+
+@keyframes soft-in{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+</style>
+</head>
+<body>
+
+<canvas id="cvs"></canvas>
+<div id="vig"></div>
+
+<div id="tl">⬡ lost</div>
+<div id="tr">—</div>
+
+<div id="wrap">
+  <div id="err-num">404</div>
+  <div id="err-label">signal not found</div>
+  <div id="err-title">you slipped into the void</div>
+  <div id="err-sub">
+    this page doesn't exist.<br>
+    <span style="color:rgba(180,140,255,.18);font-size:.88em">or maybe it never did.</span>
+  </div>
+  <a id="back-btn" href="/">
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <path d="M19 12H5M12 5l-7 7 7 7"/>
+    </svg>
+    return to signal
+  </a>
+</div>
+
+<div id="cat-cursor">
+  <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="16" cy="20" rx="7" ry="6" fill="rgba(107,31,193,0.15)" stroke="#9944ee" stroke-width="0.8"/>
+    <circle cx="16" cy="12" r="6" fill="rgba(107,31,193,0.15)" stroke="#9944ee" stroke-width="0.8"/>
+    <polygon points="11,8 9,3 14,7" fill="rgba(107,31,193,0.2)" stroke="#9944ee" stroke-width="0.7"/>
+    <polygon points="21,8 23,3 18,7" fill="rgba(107,31,193,0.2)" stroke="#9944ee" stroke-width="0.7"/>
+    <ellipse cx="13.5" cy="12" rx="1.5" ry="2" fill="rgba(212,170,255,0.9)"/>
+    <ellipse cx="18.5" cy="12" rx="1.5" ry="2" fill="rgba(212,170,255,0.9)"/>
+    <ellipse cx="13.5" cy="12" rx="0.5" ry="1.6" fill="#07000e"/>
+    <ellipse cx="18.5" cy="12" rx="0.5" ry="1.6" fill="#07000e"/>
+    <polygon points="16,14.5 15,16 17,16" fill="rgba(180,140,255,0.7)"/>
+    <path d="M23,22 Q29,18 27,26" stroke="#9944ee" stroke-width="0.8" fill="none" stroke-linecap="round"/>
+    <line x1="10" y1="14" x2="6" y2="13" stroke="rgba(180,140,255,0.35)" stroke-width="0.5"/>
+    <line x1="10" y1="15.5" x2="6" y2="15.5" stroke="rgba(180,140,255,0.35)" stroke-width="0.5"/>
+    <line x1="22" y1="14" x2="26" y2="13" stroke="rgba(180,140,255,0.35)" stroke-width="0.5"/>
+    <line x1="22" y1="15.5" x2="26" y2="15.5" stroke="rgba(180,140,255,0.35)" stroke-width="0.5"/>
+  </svg>
+</div>
+<div id="cursor-dot"></div>
+
+<script>
+const isTouch=!window.matchMedia('(hover:hover)').matches;
+const $=id=>document.getElementById(id);
+
+// canvas bg
+const cvs=$('cvs'),ctx=cvs.getContext('2d');
+let W,H;
+function resize(){W=cvs.width=window.innerWidth;H=cvs.height=window.innerHeight;}
+resize();window.addEventListener('resize',resize);
+
+let pts=[];
+function initPts(){
+  pts=Array.from({length:isTouch?60:110},()=>({
+    x:Math.random()*W,y:Math.random()*H,
+    r:.2+Math.random()*.9,a:Math.random(),da:(Math.random()-.5)*.005,
+    vx:(Math.random()-.5)*.05,vy:(Math.random()-.5)*.05,
+    hue:240+Math.random()*50
+  }));
+}
+initPts();
+
+const nebulas=[
+  {x:.3,y:.35,r:200,h:255,phase:0,a:.05},
+  {x:.7,y:.65,r:240,h:280,phase:2,a:.04},
+  {x:.15,y:.75,r:160,h:265,phase:4,a:.035},
+];
+
+let mx=W/2,my=H/2;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+
+function drawBg(t){
+  ctx.fillStyle='rgba(7,0,14,.25)';ctx.fillRect(0,0,W,H);
+  for(const n of nebulas){
+    const px=n.x*W+Math.sin(t*.00015+n.phase)*18;
+    const py=n.y*H+Math.cos(t*.00012+n.phase)*14;
+    const g=ctx.createRadialGradient(px,py,0,px,py,n.r);
+    g.addColorStop(0,`hsla(${n.h},50%,22%,${n.a})`);
+    g.addColorStop(1,'transparent');
+    ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  }
+  for(const p of pts){
+    p.a+=p.da;if(p.a<=0||p.a>=1)p.da*=-1;
+    p.x+=p.vx;p.y+=p.vy;
+    if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+    ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle=`hsla(${p.hue},65%,65%,${p.a*.4})`;ctx.fill();
+  }
+}
+(function loop(t){drawBg(t);requestAnimationFrame(loop);})(0);
+
+// time of day label
+const TOD={dawn:'⬡ dawn',morning:'⬡ morning',afternoon:'⬡ day',dusk:'⬡ dusk',evening:'⬡ evening',night:'⬡ night'};
+function tod(){const h=new Date().getHours();if(h>=5&&h<8)return'dawn';if(h>=8&&h<12)return'morning';if(h>=12&&h<17)return'afternoon';if(h>=17&&h<20)return'dusk';if(h>=20&&h<23)return'evening';return'night';}
+$('tr').textContent=TOD[tod()];
+
+// floating fragments
+const words=['lost','void','404','signal','error','null','not found','gone'];
+function spawnFrag(){
+  if(isTouch)return;
+  const f=document.createElement('div');f.className='frag';
+  f.textContent=words[Math.floor(Math.random()*words.length)];
+  f.style.left=Math.random()*90+'vw';
+  f.style.top='100vh';
+  document.body.appendChild(f);
+  const dur=12000+Math.random()*10000;
+  f.animate([
+    {transform:`translateY(0) translateX(0)`,opacity:0},
+    {opacity:1,offset:.1},
+    {opacity:.6,offset:.5},
+    {transform:`translateY(-110vh) translateX(${(Math.random()-.5)*60}px)`,opacity:0}
+  ],{duration:dur,easing:'linear'}).onfinish=()=>f.remove();
+}
+setInterval(spawnFrag,2200);
+for(let i=0;i<3;i++)setTimeout(spawnFrag,i*800);
+
+// cat cursor
+const catEl=$('cat-cursor'),dotEl=$('cursor-dot');
+let catX=W/2,catY=H/2,prevCatX=catX;
+if(!isTouch){
+  (function loop(){
+    catX+=(mx-catX)*.09;catY+=(my-catY)*.09;
+    catEl.style.left=catX+'px';catEl.style.top=catY+'px';
+    dotEl.style.left=mx+'px';dotEl.style.top=my+'px';
+    if(catX>prevCatX+.5)catEl.classList.add('run');
+    else if(catX<prevCatX-.5)catEl.classList.remove('run');
+    prevCatX=catX;requestAnimationFrame(loop);
+  })();
+}
+
+// tab flicker
+const msgs=['...','signal lost','404','come back'];let ti=0,tiv=null;
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden){tiv=setInterval(()=>{document.title=msgs[ti++%msgs.length];},1100);}
+  else{clearInterval(tiv);document.title='404 — lost signal';ti=0;}
+});
+</script>
+</body>
+</html>
