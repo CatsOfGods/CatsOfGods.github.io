@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#07000e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>skill tree — cats of gods</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap');
+:root{--bg:#07000e;--purple:#6b1fc1;--mid:#9944ee;--bright:#b877ff;--glow:#d4aaff;--text:#e8e0f5;--muted:rgba(180,140,255,0.38);--dim:rgba(180,140,255,0.18);}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{background:var(--bg);scrollbar-width:thin;scrollbar-color:rgba(107,31,193,.3) transparent;}
+html::-webkit-scrollbar{width:5px;}
+html::-webkit-scrollbar-track{background:transparent;}
+html::-webkit-scrollbar-thumb{background:rgba(107,31,193,.3);border-radius:4px;}
+body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-height:100vh;overflow-x:hidden;-webkit-tap-highlight-color:transparent;}
+body::after{content:'';position:fixed;inset:0;z-index:2;background:repeating-linear-gradient(180deg,transparent 0px,transparent 3px,rgba(0,0,0,0.04) 3px,rgba(0,0,0,0.04) 4px);pointer-events:none;}
+
+/* BACK BUTTON */
+.back-link{position:fixed;top:clamp(14px,3vw,24px);left:clamp(14px,3vw,24px);z-index:50;font-size:clamp(7px,1.5vw,9px);letter-spacing:.35em;color:var(--dim);text-transform:uppercase;text-decoration:none;padding:6px 12px;border:1px solid rgba(180,140,255,.1);transition:border-color .3s,color .3s;}
+.back-link:hover{border-color:rgba(180,140,255,.35);color:var(--glow);}
+
+/* PARTICLES */
+.particles{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.particle{position:absolute;width:2px;height:2px;background:var(--mid);border-radius:50%;opacity:0;animation:drift linear infinite;}
+@keyframes drift{0%{opacity:0;transform:translateY(100vh) translateX(0);}10%{opacity:.35;}90%{opacity:.35;}100%{opacity:0;transform:translateY(-20px) translateX(40px);}}
+
+/* VIGNETTE */
+.vig{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse 80% 80% at 50% 50%,transparent 30%,rgba(0,0,0,0.7) 100%);}
+
+/* SECTION */
+.skill-section{position:relative;z-index:5;max-width:720px;margin:0 auto;padding:clamp(60px,12vh,100px) 20px clamp(80px,14vh,120px);}
+
+/* HEADER */
+.header{text-align:center;margin-bottom:clamp(40px,8vw,64px);opacity:0;animation:fadein .9s ease .2s forwards;}
+@keyframes fadein{to{opacity:1;}}
+.header-tag{font-size:clamp(7px,1.6vw,9px);letter-spacing:.5em;color:var(--dim);text-transform:uppercase;margin-bottom:clamp(10px,2.5vw,16px);}
+.header h1{font-family:'DM Serif Display',serif;font-style:italic;font-size:clamp(26px,5.5vw,42px);color:var(--glow);letter-spacing:.04em;text-shadow:0 0 32px rgba(107,31,193,0.5);line-height:1.2;}
+.header p{margin-top:12px;font-size:clamp(9px,2vw,11px);letter-spacing:.15em;color:rgba(180,140,255,.35);line-height:1.7;max-width:380px;margin-left:auto;margin-right:auto;}
+
+/* STATS */
+.stats{display:flex;justify-content:center;gap:clamp(20px,5vw,36px);margin-bottom:clamp(40px,8vw,56px);flex-wrap:wrap;opacity:0;animation:fadein .9s ease .4s forwards;}
+.stat-num{font-size:clamp(22px,4.5vw,30px);font-weight:500;color:var(--bright);text-shadow:0 0 18px rgba(184,119,255,.4);}
+.stat-label{font-size:clamp(7px,1.5vw,9px);letter-spacing:.4em;color:rgba(180,140,255,.22);text-transform:uppercase;margin-top:2px;}
+
+/* ERA */
+.era{margin-bottom:clamp(36px,7vw,52px);}
+.era-tag-row{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:clamp(18px,4vw,28px);opacity:0;transform:translateY(10px);transition:opacity .7s,transform .7s;}
+.era-tag-row.vis{opacity:1;transform:none;}
+.era-tag-row::before,.era-tag-row::after{content:'';height:1px;flex:1;max-width:100px;}
+.era-tag-row::before{background:linear-gradient(to right,transparent,rgba(180,140,255,.12));}
+.era-tag-row::after{background:linear-gradient(to left,transparent,rgba(180,140,255,.12));}
+.era-tag{font-size:clamp(7px,1.5vw,9px);letter-spacing:.35em;color:rgba(180,140,255,.25);text-transform:uppercase;padding:4px 14px;border:1px solid rgba(180,140,255,.08);white-space:nowrap;}
+
+/* NODE GRID */
+.nodes{display:flex;flex-wrap:wrap;justify-content:center;gap:clamp(10px,2.5vw,16px);padding:0 8px;}
+
+/* NODE */
+.node{width:clamp(105px,22vw,140px);text-align:center;padding:clamp(12px,2.5vw,16px) 8px clamp(10px,2vw,14px);border:1px solid transparent;transition:all .55s cubic-bezier(.22,1,.36,1);opacity:0;transform:translateY(14px) scale(.92);}
+.node.on{opacity:1;transform:none;}
+.node.on:hover{border-color:rgba(180,140,255,.15);background:rgba(107,31,193,.06);}
+.node.on:active{transform:scale(.97);}
+.node.locked{opacity:.15;transform:translateY(0) scale(.88);pointer-events:none;filter:grayscale(1);}
+.node.future{opacity:.4;transform:translateY(0) scale(.95);}
+.node.future .orb{border-style:dashed;animation:fpulse 3s ease-in-out infinite;}
+@keyframes fpulse{0%,100%{box-shadow:0 0 8px rgba(107,31,193,.15);}50%{box-shadow:0 0 22px rgba(107,31,193,.35);}}
+
+.orb{width:clamp(44px,9vw,56px);height:clamp(44px,9vw,56px);border-radius:50%;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-size:clamp(13px,2.8vw,16px);font-weight:500;color:#fff;border:1.5px solid;transition:transform .3s,box-shadow .3s;}
+.node.on:hover .orb{transform:scale(1.1);}
+
+/* ORB COLORS */
+.c-purple .orb{background:radial-gradient(circle at 30% 30%,rgba(153,68,238,.5),rgba(107,31,193,.8));border-color:var(--mid);box-shadow:0 0 18px rgba(107,31,193,.5);}
+.c-coral .orb{background:radial-gradient(circle at 30% 30%,rgba(216,90,48,.5),rgba(153,60,29,.8));border-color:#d85a30;box-shadow:0 0 18px rgba(216,90,48,.35);}
+.c-amber .orb{background:radial-gradient(circle at 30% 30%,rgba(239,159,39,.5),rgba(133,79,11,.8));border-color:#ef9f27;box-shadow:0 0 18px rgba(239,159,39,.35);}
+.c-blue .orb{background:radial-gradient(circle at 30% 30%,rgba(55,138,221,.5),rgba(24,95,165,.8));border-color:#378add;box-shadow:0 0 18px rgba(55,138,221,.35);}
+.c-red .orb{background:radial-gradient(circle at 30% 30%,rgba(226,75,74,.5),rgba(163,45,45,.8));border-color:#e24b4a;box-shadow:0 0 18px rgba(226,75,74,.35);}
+.c-teal .orb{background:radial-gradient(circle at 30% 30%,rgba(29,158,117,.5),rgba(15,110,86,.8));border-color:#1d9e75;box-shadow:0 0 18px rgba(29,158,117,.35);}
+.c-pink .orb{background:radial-gradient(circle at 30% 30%,rgba(212,83,126,.5),rgba(153,53,86,.8));border-color:#d4537e;box-shadow:0 0 18px rgba(212,83,126,.35);}
+
+.node-name{font-size:clamp(10px,2.2vw,13px);font-weight:500;color:var(--text);line-height:1.3;margin-bottom:2px;}
+.node-meta{font-size:clamp(8px,1.7vw,10px);letter-spacing:.3em;color:rgba(180,140,255,.22);}
+
+/* LEGEND */
+.legend{display:flex;justify-content:center;flex-wrap:wrap;gap:clamp(12px,3vw,20px);margin-top:clamp(36px,7vw,52px);padding-top:clamp(24px,5vw,36px);border-top:1px solid rgba(180,140,255,.07);opacity:0;animation:fadein .9s ease .6s forwards;}
+.legend-item{display:flex;align-items:center;gap:7px;font-size:clamp(8px,1.7vw,10px);letter-spacing:.2em;color:rgba(180,140,255,.2);}
+.legend-dot{width:8px;height:8px;border-radius:50%;opacity:.7;}
+
+/* OVERLAY */
+.overlay{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:rgba(3,0,8,0);backdrop-filter:blur(0);pointer-events:none;transition:background .5s,backdrop-filter .5s;}
+.overlay.open{background:rgba(3,0,8,.88);backdrop-filter:blur(14px);pointer-events:all;}
+.card{opacity:0;transform:scale(.9) translateY(18px);transition:opacity .5s ease .15s,transform .5s ease .15s;text-align:center;padding:clamp(24px,6vw,36px) clamp(20px,5vw,32px);border:1px solid rgba(180,140,255,.1);max-width:min(360px,88vw);width:100%;}
+.overlay.open .card{opacity:1;transform:none;}
+.card-close{position:absolute;top:14px;right:16px;background:none;border:none;color:rgba(180,140,255,.25);font-family:'DM Mono',monospace;font-size:16px;cursor:pointer;padding:4px 8px;transition:color .3s;}
+.card-close:hover{color:var(--glow);}
+.card-header{display:flex;align-items:center;gap:12px;margin-bottom:14px;text-align:left;}
+.card-orb{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;color:#fff;flex-shrink:0;}
+.card-name{font-family:'DM Serif Display',serif;font-style:italic;font-size:clamp(18px,4vw,24px);color:var(--glow);letter-spacing:.03em;}
+.card-meta{font-size:clamp(9px,2vw,10px);letter-spacing:.3em;color:var(--mid);margin-top:2px;}
+.card-desc{font-size:clamp(10px,2.2vw,12px);color:rgba(200,170,255,.4);letter-spacing:.08em;line-height:1.8;margin-bottom:14px;text-align:left;}
+.card-ach{padding:8px 12px;border:1px solid rgba(239,159,39,.15);background:rgba(239,159,39,.05);font-size:clamp(10px,2vw,11px);letter-spacing:.1em;color:rgba(239,159,39,.7);display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.projs-label{font-size:clamp(7px,1.5vw,8px);letter-spacing:.45em;color:rgba(180,140,255,.18);text-transform:uppercase;margin-bottom:6px;text-align:left;}
+.projs{display:flex;flex-wrap:wrap;gap:5px;}
+.proj{font-size:clamp(9px,1.8vw,10px);padding:3px 10px;border:1px solid rgba(180,140,255,.1);color:rgba(180,140,255,.4);letter-spacing:.1em;white-space:nowrap;}
+
+@media(max-width:400px){
+  .nodes{gap:8px;}
+  .node{width:calc(50% - 12px);}
+}
+</style>
+</head>
+<body>
+
+<a href="index.html" class="back-link">← back</a>
+
+<div class="particles" id="pt"></div>
+<div class="vig"></div>
+
+<section class="skill-section">
+  <div class="header">
+    <div class="header-tag">// skill_tree</div>
+    <h1>мой путь</h1>
+    <p>кодю с 9 лет. тут всё что было — от олимпиад до даркнета и обратно</p>
+  </div>
+
+  <div class="stats">
+    <div style="text-align:center"><div class="stat-num">9+</div><div class="stat-label">лет в деле</div></div>
+    <div style="text-align:center"><div class="stat-num">7</div><div class="stat-label">языков</div></div>
+    <div style="text-align:center"><div class="stat-num">5</div><div class="stat-label">дипломов</div></div>
+    <div style="text-align:center"><div class="stat-num">10k+</div><div class="stat-label">строк</div></div>
+  </div>
+
+  <!-- ERA 1 -->
+  <div class="era">
+    <div class="era-tag-row"><span class="era-tag">начало · 5–10 лет · 2017–2022</span></div>
+    <div class="nodes">
+      <div class="node c-amber locked" data-id="chess" data-d="0"><div class="orb">♟</div><div class="node-name">шахматы</div><div class="node-meta">5 · 2017</div></div>
+      <div class="node c-coral locked" data-id="math" data-d="150"><div class="orb">∑</div><div class="node-name">математика</div><div class="node-meta">5 · 2017</div></div>
+      <div class="node c-amber locked" data-id="olymp" data-d="300"><div class="orb">★</div><div class="node-name">олимпиады</div><div class="node-meta">8 · 2020</div></div>
+    </div>
+  </div>
+
+  <!-- ERA 2 -->
+  <div class="era">
+    <div class="era-tag-row"><span class="era-tag">курс 5 лет · 9–13 лет · 2021–2025</span></div>
+    <div class="nodes">
+      <div class="node c-purple locked" data-id="html" data-d="0"><div class="orb">&lt;/&gt;</div><div class="node-name">html + css</div><div class="node-meta">9 · 2021</div></div>
+      <div class="node c-purple locked" data-id="js" data-d="120"><div class="orb">JS</div><div class="node-name">javascript</div><div class="node-meta">10 · 2022</div></div>
+      <div class="node c-blue locked" data-id="python" data-d="240"><div class="orb">Py</div><div class="node-name">python</div><div class="node-meta">11 · 2023</div></div>
+      <div class="node c-blue locked" data-id="php" data-d="360"><div class="orb">{}</div><div class="node-name">php</div><div class="node-meta">12 · 2024</div></div>
+      <div class="node c-purple locked" data-id="shop" data-d="480"><div class="orb">⬡</div><div class="node-name">интернет-магазин</div><div class="node-meta">13 · 2025</div></div>
+    </div>
+  </div>
+
+  <!-- ERA 3 -->
+  <div class="era">
+    <div class="era-tag-row"><span class="era-tag">выгорание · 13–14 · 2025</span></div>
+    <div class="nodes">
+      <div class="node c-red locked" data-id="linux" data-d="0"><div class="orb">$_</div><div class="node-name">linux + кибербез</div><div class="node-meta">13 · 2025</div></div>
+      <div class="node c-teal locked" data-id="tg" data-d="150"><div class="orb">TG</div><div class="node-name">telegram проекты</div><div class="node-meta">14 · 2025</div></div>
+      <div class="node c-teal locked" data-id="free" data-d="300"><div class="orb">$</div><div class="node-name">фриланс</div><div class="node-meta">14 · 2025</div></div>
+    </div>
+  </div>
+
+  <!-- ERA 4 -->
+  <div class="era">
+    <div class="era-tag-row"><span class="era-tag">геймдев + мобилка · 14 · 2025–2026</span></div>
+    <div class="nodes">
+      <div class="node c-teal locked" data-id="luau" data-d="0"><div class="orb">R</div><div class="node-name">luau / roblox</div><div class="node-meta">14 · 2025</div></div>
+      <div class="node c-pink locked" data-id="flutter" data-d="150"><div class="orb">FL</div><div class="node-name">flutter</div><div class="node-meta">14 · 2025</div></div>
+      <div class="node c-pink locked" data-id="kotlin" data-d="300"><div class="orb">Kt</div><div class="node-name">kotlin</div><div class="node-meta">14 · 2026</div></div>
+      <div class="node c-pink locked" data-id="execbin" data-d="450"><div class="orb">EB</div><div class="node-name">execbin</div><div class="node-meta">14 · 2026</div></div>
+    </div>
+  </div>
+
+  <!-- ERA 5 -->
+  <div class="era">
+    <div class="era-tag-row"><span class="era-tag">что дальше · 2027</span></div>
+    <div class="nodes">
+      <div class="node c-purple future" data-id="lyceum" data-d="0"><div class="orb">⌐</div><div class="node-name">лицей кибербез</div><div class="node-meta">15 · 2027</div></div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#d85a30"></div>фундамент</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#9944ee"></div>веб</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#378add"></div>backend</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#e24b4a"></div>linux</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#1d9e75"></div>проекты</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#d4537e"></div>мобильная</div>
+  </div>
+</section>
+
+<!-- CARD OVERLAY -->
+<div class="overlay" id="ov">
+  <div class="card" style="position:relative">
+    <button class="card-close" id="cc">✕</button>
+    <div class="card-header">
+      <div class="card-orb" id="co"></div>
+      <div><div class="card-name" id="cn"></div><div class="card-meta" id="cm"></div></div>
+    </div>
+    <div class="card-desc" id="cd"></div>
+    <div id="ca"></div>
+    <div id="cp"></div>
+  </div>
+</div>
+
+<script>
+const D={
+chess:{n:'шахматы',m:'5 лет · 2017',i:'♟',bg:'radial-gradient(circle at 30% 30%,rgba(239,159,39,.5),rgba(133,79,11,.8))',
+  d:'играл с детства, прям реально нравилось. не просто так — шахматы научили думать на несколько шагов вперёд, потом это помогло вообще везде',p:[],a:null},
+math:{n:'математика',m:'5 лет · 2017',i:'∑',bg:'radial-gradient(circle at 30% 30%,rgba(216,90,48,.5),rgba(153,60,29,.8))',
+  d:'в классе был сильно впереди всех. в 4 классе сдал олимпиаду за 6 — межрегиональную, занял 3 место. до сих пор горжусь',p:[],a:'3 место — межрегиональная за 6 класс (учился в 4-м)'},
+olymp:{n:'олимпиады',m:'8 лет · 2020',i:'★',bg:'radial-gradient(circle at 30% 30%,rgba(239,159,39,.5),rgba(133,79,11,.8))',
+  d:'выиграл несколько олимпиад по математике. самая жирная — межрегиональная, когда мне было 8 и я решал задачи за 6 класс',p:[],a:'топ-3 межрегиональная олимпиада'},
+html:{n:'html + css',m:'9 лет · 2021',i:'</>',bg:'radial-gradient(circle at 30% 30%,rgba(153,68,238,.5),rgba(107,31,193,.8))',
+  d:'поступил на 5-летний курс программирования. первый язык — вёрстка. тогда ещё не понимал зачем, но основа заложилась',p:[],a:'диплом'},
+js:{n:'javascript',m:'10 лет · 2022',i:'JS',bg:'radial-gradient(circle at 30% 30%,rgba(153,68,238,.5),rgba(107,31,193,.8))',
+  d:'второй год курса. тут уже пошла логика, DOM, интерактив. начало становиться интересно по-настоящему',p:[],a:'диплом'},
+python:{n:'python',m:'11 лет · 2023',i:'Py',bg:'radial-gradient(circle at 30% 30%,rgba(55,138,221,.5),rgba(24,95,165,.8))',
+  d:'скрипты, автоматизация. потом очень пригодился для ботов в телеге',p:[],a:'диплом'},
+php:{n:'php',m:'12 лет · 2024',i:'{}',bg:'radial-gradient(circle at 30% 30%,rgba(55,138,221,.5),rgba(24,95,165,.8))',
+  d:'серверная часть, MySQL. понял как вообще работает бэкенд и базы данных',p:[],a:'диплом'},
+shop:{n:'интернет-магазин',m:'13 лет · 2025',i:'⬡',bg:'radial-gradient(circle at 30% 30%,rgba(153,68,238,.5),rgba(107,31,193,.8))',
+  d:'финалка курса — написал целый магазин на 2000+ строк. пятый диплом. по сути языки не сильно запомнил, но зато понял структуру — и это главное',p:['интернет-магазин · 2000+ строк'],a:'5-й диплом — финальный проект'},
+linux:{n:'linux + кибербез',m:'13 лет · 2025',i:'$_',bg:'radial-gradient(circle at 30% 30%,rgba(226,75,74,.5),rgba(163,45,45,.8))',
+  d:'выгорел от кода. ушёл в linux, кибербез, даже полез в даркнет. но вовремя остановился — до того как нарушил закон в любом понимании этого слова',p:[],a:null},
+tg:{n:'telegram проекты',m:'14 лет · 2025',i:'TG',bg:'radial-gradient(circle at 30% 30%,rgba(29,158,117,.5),rgba(15,110,86,.8))',
+  d:'делал переходники за звёзды в тг. написал проект типа доксбина на 900+ строк. вроде не кодил, а руки сами тянулись',p:['переходники за звёзды','doxxbin · 900+ строк'],a:null},
+free:{n:'фриланс',m:'14 лет · 2025',i:'$',bg:'radial-gradient(circle at 30% 30%,rgba(29,158,117,.5),rgba(15,110,86,.8))',
+  d:'компания с 20к+ клиентов наняла меня делать сайт. проект пока не закончен — собираются вернуть меня летом',p:['сайт для компании · 20к+ клиентов'],a:'первый коммерческий заказ'},
+luau:{n:'luau / roblox',m:'14 лет · 2025',i:'R',bg:'radial-gradient(circle at 30% 30%,rgba(29,158,117,.5),rgba(15,110,86,.8))',
+  d:'начал скриптить игры в роблоксе. создал кучу проектов, но ни один не взлетел — не хватало времени и моделей',p:['gravity shift arena','glass bridge','IQ counter','zombie defense'],a:null},
+flutter:{n:'flutter',m:'14 лет · 2025',i:'FL',bg:'radial-gradient(circle at 30% 30%,rgba(212,83,126,.5),rgba(153,53,86,.8))',
+  d:'попробовал — не зашёл. показался непрактичным, бросил и перешёл на котлин',p:[],a:null},
+kotlin:{n:'kotlin',m:'14 лет · 2026',i:'Kt',bg:'radial-gradient(circle at 30% 30%,rgba(212,83,126,.5),rgba(153,53,86,.8))',
+  d:'нашёл свой язык для мобилки. пишу на нём execbin — и кайфую',p:[],a:null},
+execbin:{n:'execbin',m:'14 лет · 2026',i:'EB',bg:'radial-gradient(circle at 30% 30%,rgba(212,83,126,.5),rgba(153,53,86,.8))',
+  d:'главный проект прямо сейчас. 7000+ строк на котлине. @tgexecbin — скоро в play store. самая большая штука что я когда-либо делал',p:['@tgexecbin','7000+ строк','play store релиз'],a:'крупнейший проект'},
+lyceum:{n:'лицей кибербез',m:'15 лет · 2027',i:'⌐',bg:'radial-gradient(circle at 30% 30%,rgba(153,68,238,.5),rgba(107,31,193,.8))',
+  d:'в следующем году поступаю в лицей на кибербезопасность. надеюсь стать лучше',p:[],a:null}
+};
+
+// particles
+const pe=document.getElementById('pt');
+for(let i=0;i<20;i++){const p=document.createElement('div');p.className='particle';p.style.left=Math.random()*100+'%';p.style.animationDuration=(8+Math.random()*14)+'s';p.style.animationDelay=Math.random()*10+'s';p.style.width=p.style.height=(1+Math.random()*2)+'px';pe.appendChild(p);}
+
+// scroll unlock
+const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(!e.isIntersecting)return;const el=e.target;if(el.classList.contains('era-tag-row')){el.classList.add('vis');obs.unobserve(el);return;}
+if(el.classList.contains('node')&&!el.classList.contains('future')){const d=parseInt(el.dataset.d)||0;setTimeout(()=>{el.classList.remove('locked');el.classList.add('on');},d);obs.unobserve(el);}});},{threshold:.15,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.node,.era-tag-row').forEach(e=>obs.observe(e));
+
+// card
+const ov=document.getElementById('ov');
+document.querySelectorAll('.node').forEach(n=>{n.addEventListener('click',()=>{
+  const d=D[n.dataset.id];if(!d)return;
+  document.getElementById('co').style.background=d.bg;
+  document.getElementById('co').textContent=d.i;
+  document.getElementById('cn').textContent=d.n;
+  document.getElementById('cm').textContent=d.m;
+  document.getElementById('cd').textContent=d.d;
+  document.getElementById('ca').innerHTML=d.a?`<div class="card-ach">⭐ ${d.a}</div>`:'';
+  document.getElementById('cp').innerHTML=d.p.length?`<div class="projs-label">проекты</div><div class="projs">${d.p.map(x=>`<span class="proj">${x}</span>`).join('')}</div>`:'';
+  ov.classList.add('open');
+});});
+document.getElementById('cc').addEventListener('click',()=>ov.classList.remove('open'));
+ov.addEventListener('click',e=>{if(e.target===ov)ov.classList.remove('open');});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')ov.classList.remove('open');});
+</script>
+</body>
+</html>
